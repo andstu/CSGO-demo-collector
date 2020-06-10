@@ -1,4 +1,5 @@
 import urllib.request
+import requests
 from bs4 import BeautifulSoup
 
 site= "https://csgostats.gg/match"
@@ -17,18 +18,22 @@ except urllib.error.HTTPError as e:
     print(e.fp.read())
 
 soup = BeautifulSoup(page, "html.parser")
-for icon in soup.find_all("span", class_="glyphicon glyphicon-play-circle"):
-    matchURL = "https://csgostats.gg" + icon.find_parent("a").get('href')
-    req = urllib.request.Request(matchURL, headers=hdr)
-    try:
-        matchPage = urllib.request.urlopen(req)
-    except urllib.error.HTTPError as e:
-        print(e.fp.read())
-    soup = BeautifulSoup(matchPage, "html.parser")
-    demoURL = "https://csgostats.gg" + soup.find("span", class_="glyphicon glyphicon-facetime-video").find_parent("a").get("href")
-    req = urllib.request.Request(demoURL, headers=hdr)
-    try:
-        demoRes = urllib.request.urlopen(req)
-    except urllib.error.HTTPError as e:
-        demoRes = e.fp.read()
-    print(demoRes)
+with open('ShareCodes', 'a') as f:
+    for icon in soup.find_all("span", class_="glyphicon glyphicon-play-circle"):
+        matchURL = "https://csgostats.gg" + icon.find_parent("a").get('href')
+        req = urllib.request.Request(matchURL, headers=hdr)
+        try:
+            matchPage = urllib.request.urlopen(req)
+        except urllib.error.HTTPError as e:
+            print(e.fp.read())
+        soup = BeautifulSoup(matchPage, "html.parser")
+        demoURL = "https://csgostats.gg" + soup.find("span", class_="glyphicon glyphicon-facetime-video").find_parent("a").get("href")
+        req = urllib.request.Request(demoURL, headers=hdr)
+        try:
+            demoRes = urllib.request.urlopen(req)
+        except urllib.error.HTTPError as e:
+            demoRes = e.fp.read()
+        if demoRes:
+            soup = BeautifulSoup(demoRes, "html.parser")
+            matchid = soup.find("a").get('href')
+            f.write(matchid[-len('CSGO-AKxQC-ftWKD-LAFyz-FQ8AH-CcyMM'):] + '\n')
