@@ -66,11 +66,15 @@ def gc_ready():
         cs.request_full_match_info(meme['matchid'], meme['outcomeid'], meme['token'])
         response, = cs.wait_event('full_match_info')
         site = response.matches[0].roundstatsall[-1].map
-        file_name = f"{meme['matchid']}_{meme['outcomeid']}_{meme['token']}"
+        file_name = f"./unprocessed/{meme['matchid']}_{meme['outcomeid']}_{meme['token']}"
         print(site)
         print(file_name)
-        with urllib.request.urlopen(site) as res, open(file_name, 'wb') as out_file:
-            shutil.copyfileobj(res, out_file)
+        req = urllib.request.Request(site, headers=hdr)
+        try:
+            with urllib.request.urlopen(req) as res, open(file_name, 'wb') as out_file:
+                shutil.copyfileobj(res, out_file)
+        except urllib.error.HTTPError as e:
+            print(e)
 
     cs.exit()
     cs.emit('meme')
